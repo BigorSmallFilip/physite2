@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1.0, user-scalable=no">
+	<title>Physite 2</title>
+	<link rel="stylesheet" href="master.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"
+		integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ=="
+		crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script src="javascript/nav.js"></script>
+</head>
+<body>
+	<nav>
+		<header>Physite 2</header>
+
+		<button class="section-header" id="section-header-file" type="button" onclick="toggleNavSection('file');">File <i class="fa fa-caret-down" style="display: inline-block"></i></button>
+		<div class="section-tab" id="section-file"><section>
+			<input type="button" value="Test button">
+			<label>Test num<input type="number" value="2" id="testvar" onchange="testvar = this.value;"></label>
+			<label>Gravity<input type="number" value="2" id="navinp-gravity" onchange="gravity = parseFloat(this.value) / 10;"></label>
+			<label>Physics substeps<input type="number" value="16" id="navinp-physics-substeps" onchange="physicsSubsteps = parseInt(this.value);"></label>
+		</section></div>
+
+		<button class="section-header" id="section-header-rendering" type="button" onclick="toggleNavSection('rendering');">Rendering <i class="fa fa-caret-down" style="display: inline-block"></i></button>
+		<div class="section-tab" id="section-rendering"><section>
+			<label>Render Balls<input type="checkbox" id="renderSettings_renderBalls" onchange="renderSettings_renderBalls = this.checked" checked></label>
+		</section></div>
+
+		<button class="section-header" id="section-header-simulation" type="button" onclick="toggleNavSection('simulation');">Simulation <i class="fa fa-caret-down" style="display: inline-block"></i></button>
+		<div class="section-tab" id="section-simulation"><section>
+			<p>Physics time ms: <span id="physicstime-debug">0</span></p>
+			<p>Render time ms: <span id="rendertime-debug">0</span></p>
+			<p>Total time ms: <span id="totaltime-debug">0</span></p>
+			<p style="letter-spacing: 0.2rem;"><i><b>THE GRAPH (TM)</b></i></p>
+			<div id="statsgraph">
+				<canvas id="statsgraph-canvas"></canvas>
+			</div>
+			<label>Target framerate<input type="number" value="60" id="navinp-targetframerate" onchange="sg_targetDeltaTime = (1 / parseFloat(this.value)) * 1000;"></label>
+		</section></div>
+	</nav>
+
+	<section id="sim-section">
+		<canvas id="sim-canvas"></canvas>
+	</section>
+
+
+
+	<script src="javascript/main.js"></script>
+	<script src="javascript/scene.js"></script>
+	<script src="javascript/render.js"></script>
+	<script src="javascript/rendergl.js"></script>
+	<script src="javascript/physics.js"></script>
+	<script src="javascript/editor.js"></script>
+	<script src="javascript/statsgraph.js"></script>
+	<script>
+		initSimulationCanvas();
+		initStatsGraphCanvas();
+
+		const minBallSize = 9;
+		const maxBallSize = 15;
+		sceneBalls = [];
+		const bl = 1000;
+		for (let i = 0; i < bl; i++) {
+			sceneBalls.push(new Ball(
+				Math.random() * simCanvasWidth,
+				Math.random() * simCanvasHeight,
+				Math.random() - 0.5,
+				Math.random() - 0.5,
+				Math.random() * (maxBallSize - minBallSize) + minBallSize,
+				[Math.random() * 0.9 + 0.1, Math.random() * 0.9 + 0.1, Math.random() * 0.9 + 0.1]
+			));
+		}
+
+		updateAllLines();
+
+		initSpacePartitioning(maxBallSize * 2, maxBallSize * 2);
+
+		initInputEvents();
+		mainLoop();
+	</script>
+</body>
+</html>
